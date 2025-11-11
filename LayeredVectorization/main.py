@@ -215,11 +215,13 @@ def layered_vectorization(args,device=None):
     os.makedirs(layerd_struct_save_path,exist_ok=True)
 
     print("SDS-based Simplification...")
-    simp_img_seq = sds_based_simplification(device,
+    # diffusion model is too heavy for my gpu... (sad face emoji)
+    simp_img_seq = sds_based_simplification(torch.device("cpu"),
                                             args.target_image,
                                             args.simp_img_seq_indexs,
                                             simp_img_seq_save_path,
                                             all_simp_img_seq_save_path)
+
     target_img = simp_img_seq[0]
     img_height, img_width = target_img.shape[:2]
 
@@ -325,7 +327,7 @@ if __name__ == "__main__":
 
     import glob
     # 定义文件夹路径
-    folder_path = '/home/ubuntu/workspace/WZY/Projects/image_vectorization-1.3/target_imgs/002'
+    folder_path = './target_imgs'
     # 获取所有 PNG 文件的路径
     png_files = glob.glob(f'{folder_path}/*.png')
 
@@ -337,6 +339,8 @@ if __name__ == "__main__":
 
         args = parser.parse_args()
         args = load_config(args.config,args)
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        init_diffvg(device=device)
+        # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        device_cpu = torch.device("cpu")
+        device = torch.device("cpu")
+        init_diffvg(device=device_cpu, use_gpu=False)
         layered_vectorization(args,device)
